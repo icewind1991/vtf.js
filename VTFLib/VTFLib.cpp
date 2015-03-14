@@ -11,9 +11,10 @@
 
 #include "VTFLib.h"
 #include "VTFFile.h"
-#include <emscripten/bind.h>
+#include "VTFWrapper.h"
+//#include <emscripten/bind.h>
 
-using namespace emscripten;
+//using namespace emscripten;
 
 using namespace VTFLib;
 
@@ -307,7 +308,40 @@ VTFLIB_API vlVoid vlSetFloat(VTFLibOption Option, vlSingle sValue)
 	}
 }
 
-EMSCRIPTEN_BINDINGS(vtf) {
-    function("vlInitialize", &vlInitialize);
-    function("vlShutdown", &vlShutdown);
+vlBool createSingle(vlUInt width, vlUInt height, unsigned char* data) {
+	SVTFCreateOptions options;
+	vlImageCreateDefaultCreateStructure(&options);
+//	options.ImageFormat = IMAGE_FORMAT_DXT5;
+	options.bMipmaps = vlFalse;
+	options.bResize=false;
+	return vlImageCreateSingle(width, height, data, &options);
 }
+
+extern "C"{
+
+
+bool fromData(vlUInt width, vlUInt height, unsigned char* data) {
+	vlUInt uiVTFImage;
+	vlInitialize();
+	vlCreateImage(&uiVTFImage);
+   	vlBindImage(uiVTFImage);
+	bool result= createSingle(width, height, data);
+	printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
+	return result;
+//	vlImageSaveLump()
+}
+}
+
+//vlBool createSingle(vlUInt width, vlUInt height, std::vector<vlByte> data) {
+//	SVTFCreateOptions options;
+//	options.ImageFormat = IMAGE_FORMAT_DXT5;
+//	return vlImageCreateSingle(width, height, &data[0], &options);
+//}
+
+//EMSCRIPTEN_BINDINGS(vtf) {
+//	register_vector<vlByte>("VectorBYTE");
+//    function("vlInitialize", &vlInitialize);
+//    function("vlShutdown", &vlShutdown);
+////    function("createSingle", &createSingle);
+//    function("createSingle", &createSingle, allow_raw_pointer<arg<2>>());
+//}

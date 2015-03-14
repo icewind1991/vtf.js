@@ -572,6 +572,7 @@ vlBool CVTFFile::Create(vlUInt uiWidth, vlUInt uiHeight, vlUInt uiFrames, vlUInt
 	{
 		if(VTFCreateOptions.bResize)
 		{
+			printf("resize");
 			vlUInt uiNewWidth = uiWidth;
 			vlUInt uiNewHeight = uiHeight;
 
@@ -1045,15 +1046,15 @@ vlBool CVTFFile::Save(const vlChar *cFileName) const
 
 vlBool CVTFFile::Save(vlVoid *lpData, vlUInt uiBufferSize, vlUInt &uiSize) const
 {
-//	uiSize = 0;
-//
-//	IO::Writers::CMemoryWriter MemoryWriter = IO::Writers::CMemoryWriter(lpData, uiBufferSize);
-//
-//	vlBool bResult = this->Save(&MemoryWriter);
-//
-//	uiSize = MemoryWriter.GetStreamSize();
-//
-//	return bResult;
+	uiSize = 0;
+
+	IO::Writers::CMemoryWriter MemoryWriter = IO::Writers::CMemoryWriter(lpData, uiBufferSize);
+
+	vlBool bResult = this->Save(&MemoryWriter);
+
+	uiSize = MemoryWriter.GetStreamSize();
+
+	return bResult;
 }
 
 vlBool CVTFFile::Save(vlVoid *pUserData) const

@@ -7,3 +7,4 @@
  */
 
 #include "Writer.h"
+#include "MemoryWriter.h"

@@ -51,6 +51,8 @@ typedef vlSingle		vlFloat;			//!< Floating point number (same as vlSingled).
 #define vlTrue			1
 
 #define FILE_BEGIN 0
+#define FILE_CURRENT 1
+#define FILE_END 2
 
 #if _MSC_VER >= 1400
 #	define _CRT_SECURE_NO_WARNINGS
