@@ -320,28 +320,14 @@ vlBool createSingle(vlUInt width, vlUInt height, unsigned char* data) {
 extern "C"{
 
 
-bool fromData(vlUInt width, vlUInt height, unsigned char* data) {
-	vlUInt uiVTFImage;
-	vlInitialize();
-	vlCreateImage(&uiVTFImage);
-   	vlBindImage(uiVTFImage);
-	bool result= createSingle(width, height, data);
-	printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
-	return result;
-//	vlImageSaveLump()
+	bool fromData(vlUInt width, vlUInt height, unsigned char* data) {
+		vlUInt uiVTFImage;
+		vlInitialize();
+		vlCreateImage(&uiVTFImage);
+		vlBindImage(uiVTFImage);
+		bool result= createSingle(width, height, data);
+		printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
+		return result;
+	//	vlImageSaveLump()
+	}
 }
-}
-
-//vlBool createSingle(vlUInt width, vlUInt height, std::vector<vlByte> data) {
-//	SVTFCreateOptions options;
-//	options.ImageFormat = IMAGE_FORMAT_DXT5;
-//	return vlImageCreateSingle(width, height, &data[0], &options);
-//}
-
-//EMSCRIPTEN_BINDINGS(vtf) {
-//	register_vector<vlByte>("VectorBYTE");
-//    function("vlInitialize", &vlInitialize);
-//    function("vlShutdown", &vlShutdown);
-////    function("createSingle", &createSingle);
-//    function("createSingle", &createSingle, allow_raw_pointer<arg<2>>());
-//}

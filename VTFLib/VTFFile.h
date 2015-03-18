@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+extern vlBool canvasResize(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA8888, vlUInt uiSourceWidth, vlUInt uiSourceHeight, vlUInt uiDestWidth, vlUInt uiDestHeight);
+
 //! VTFImageFormat info struct.
 /*!  
 	The SVTFImageFormatInfo struct provides information on VTF image formats.

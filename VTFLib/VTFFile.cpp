@@ -4084,47 +4084,7 @@ vlBool CVTFFile::Resize(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA8888, vlUInt
 {
 	assert(ResizeFilter >= 0 && ResizeFilter < MIPMAP_FILTER_COUNT);
 	assert(SharpenFilter >= 0 && SharpenFilter < SHARPEN_FILTER_COUNT);
-
-#ifdef USE_NVDXT
-	nvCompressionOptions Options = nvCompressionOptions();
-
-	SNVCompressionUserData UserData = SNVCompressionUserData(lpDestRGBA8888, IMAGE_FORMAT_RGBA8888);
-
-	// Don't generate mipmaps.
-	Options.mipMapGeneration = kNoMipMaps;
-
-	// Set new image size.
-	Options.rescaleImageType = kRescalePreScale;
-	Options.scaleX = (vlSingle)uiDestWidth;
-	Options.scaleY = (vlSingle)uiDestHeight;
-
-	// Set resize filter.
-	Options.rescaleImageFilter = (nvMipFilterTypes)ResizeFilter;
-
-	// Setup sharpen filter.
-	if(SharpenFilter != SHARPEN_FILTER_NONE)
-	{
-		Options.sharpenFilterType = (nvSharpenFilterTypes)SharpenFilter;
-		Options.sharpening_passes_per_mip_level[0] = 1;
-		Options.unsharp_data.radius32F = sUnsharpenRadius;
-		Options.unsharp_data.amount32F = sUnsharpenAmount;
-		Options.unsharp_data.threshold32F = sUnsharpenThreshold;
-		Options.xsharp_data.strength32F = sXSharpenStrength;
-		Options.xsharp_data.threshold32F = sXSharpenThreshold;
-	}
-
-	// Set the format.
-	Options.textureFormat = k8888;
-	Options.bSwapRB = true;
-
-	// The UserData struct gets passed to our callback.
-	Options.user_data = &UserData;
-
-	return nvDXTCompressWrapper(lpSourceRGBA8888, uiSourceWidth, uiSourceHeight, &Options, NVWriteCallback);
-#else
-	LastError.Set("NVDXT support required for CVTFFile::Resize().");
-	return vlFalse;
-#endif
+	return canvasResize(lpSourceRGBA8888, lpDestRGBA8888, uiSourceWidth, uiSourceHeight, uiDestWidth, uiDestHeight);
 }
 
 //
