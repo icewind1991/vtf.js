@@ -21,6 +21,7 @@
 #define VTFFILE_H
 
 #include "stdafx.h"
+#include "../squish/squish.h"
 #include "Readers.h"
 #include "Writers.h"
 #include "VTFFormat.h"

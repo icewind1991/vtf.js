@@ -326,7 +326,7 @@ extern "C"{
 		vlCreateImage(&uiVTFImage);
 		vlBindImage(uiVTFImage);
 		bool result= createSingle(width, height, data);
-		printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
+//		printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
 		return result;
 	//	vlImageSaveLump()
 	}

@@ -3398,83 +3398,28 @@ vlBool CVTFFile::ConvertFromRGBA8888(vlByte *lpSource, vlByte *lpDest, vlUInt ui
 //
 // CompressDXTn()
 // Compress input image data (lpSource) to output image data (lpDest) of format DestFormat
-// where DestFormat is of format DXTn.  Uses NVidia DXT library.
+// where DestFormat is of format DXTn.  Uses squish.
 //
 vlBool CVTFFile::CompressDXTn(vlByte *lpSource, vlByte *lpDest, vlUInt uiWidth, vlUInt uiHeight, VTFImageFormat DestFormat)
 {
-#ifdef USE_NVDXT
-	nvCompressionOptions Options = nvCompressionOptions();
-
-	SNVCompressionUserData UserData = SNVCompressionUserData(lpDest, DestFormat);
-
-	// Don't generate mipmaps.
-	Options.mipMapGeneration = kNoMipMaps;
-
-	// Set the format.
-	switch(uiDXTQuality)
-	{
-	case DXT_QUALITY_LOW:
-		Options.quality = kQualityFastest;
-		break;
-	case DXT_QUALITY_MEDIUM:
-		Options.quality = kQualityNormal;
-		break;
-	case DXT_QUALITY_HIGH:
-		Options.quality = kQualityProduction;
-		break;
-	case DXT_QUALITY_HIGHEST:
-		Options.quality = kQualityHighest;
-		break;
-	}
+	int flags = 0;
 	switch(DestFormat)
 	{
 	case IMAGE_FORMAT_DXT1:
-		Options.textureFormat = kDXT1;
-		Options.bForceDXT1FourColors = true;
-		break;
-	case IMAGE_FORMAT_DXT1_ONEBITALPHA:
-		Options.bBinaryAlpha = true;
-		Options.bForceDXT1FourColors = true;
-		Options.textureFormat = kDXT1a;
-		/*for(vlUInt i = 3; i < uiWidth * uiHeight * 4; i += 4)
-		{
-			lpSource[i] = lpSource[i] >= 128 ? 255 : 0;
-		}*/
+		flags = ( 1 << 0 );
 		break;
 	case IMAGE_FORMAT_DXT3:
-		Options.textureFormat = kDXT3;
+		flags = ( 1 << 1 );
 		break;
 	case IMAGE_FORMAT_DXT5:
-		Options.textureFormat = kDXT5;
+		flags = ( 1 << 2 );
 		break;
 	default:
 		LastError.Set("Destination image format not supported.");
 		return vlFalse;
 	}
-
-	// nvDXTcompressRGBA() fails on widths or heights of 1 or 2 so rescale those images.
-	if(uiWidth < 4)
-	{
-		Options.rescaleImageType = kRescalePreScale;
-		Options.rescaleImageFilter = kMipFilterPoint;
-		Options.scaleX = 4.0f;
-	}
-
-	if(uiHeight < 4)
-	{
-		Options.rescaleImageType = kRescalePreScale;
-		Options.rescaleImageFilter = kMipFilterPoint;
-		Options.scaleY = 4.0f;
-	}
-
-	// The UserData struct gets passed to our callback.
-	Options.user_data = &UserData;
-
-	return nvDXTCompressWrapper(lpSource, uiWidth, uiHeight, &Options, NVWriteCallback);
-#else
-	LastError.Set("NVDXT support required for DXTn compression).");
-	return vlFalse;
-#endif
+	squish::CompressImage(lpSource, uiWidth, uiHeight, lpDest, flags);
+	return vlTrue;
 }
 
 typedef vlVoid (*TransformProc)(vlUInt16& R, vlUInt16& G, vlUInt16& B, vlUInt16& A);

@@ -18,10 +18,6 @@ mergeInto(LibraryManager.library, {
 			targetCanvas.height = targetHeight;
 			targetContext.drawImage(sourceCanvas, 0, 0, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
 
-			// debug
-			var out = document.getElementById('resize-out');
-			out.getContext("2d").drawImage(sourceCanvas, 0, 0, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
-
 			return targetContext.getImageData(0, 0, targetWidth, targetHeight).data;
 		};
 
