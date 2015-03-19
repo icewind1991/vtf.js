@@ -14,14 +14,16 @@ mergeInto(LibraryManager.library, {
 
 			var targetCanvas = document.createElement("canvas");
 			var targetContext = targetCanvas.getContext("2d");
+			targetCanvas.width = targetWidth;
+			targetCanvas.height = targetHeight;
 			targetContext.drawImage(sourceCanvas, 0, 0, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
 
 			// debug
 			var out = document.getElementById('resize-out');
 			out.getContext("2d").drawImage(sourceCanvas, 0, 0, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
 
-			return targetContext.getImageData(0, 0, targetCanvas.width, targetCanvas.height).data;
-		}
+			return targetContext.getImageData(0, 0, targetWidth, targetHeight).data;
+		};
 
 		var resultData = resize(sourceRGBA, sourceWidth, sourceHeight, targetWidth, targetHeight);
 		Module.HEAPU8.set(resultData, targetRGBA);
