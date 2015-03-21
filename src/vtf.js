@@ -46,4 +46,4 @@ exports.fromRGBA = function (sourceData, width, height) {
 	saveLumb(targetPointer, targetSize, sizePointer);
 	var resultSize = (new Uint32Array(vtflib.HEAPU8.buffer, sizePointer, 1))[0];
 	return getDataFromPointer(targetPointer, resultSize);
-}
+};
