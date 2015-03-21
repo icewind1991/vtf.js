@@ -11,7 +11,6 @@
 
 #include "VTFLib.h"
 #include "VTFFile.h"
-#include "VMTFile.h"
 #include "VTFWrapper.h"
 
 using namespace VTFLib;
@@ -23,9 +22,6 @@ namespace VTFLib
 
 	CVTFFile *Image = 0;
 	CImageVector *ImageVector = 0;
-
-	CVMTFile *Material = 0;
-	CMaterialVector *MaterialVector = 0;
 
 	vlUInt uiDXTQuality = DXT_QUALITY_HIGH;
 
@@ -51,8 +47,6 @@ namespace VTFLib
 
 	vlSingle sXSharpenStrength = 255.0f;
 	vlSingle sXSharpenThreshold = 255.0f;
-
-	vlUInt uiVMTParseMode = PARSE_MODE_LOOSE;
 }
 
 //
@@ -97,7 +91,6 @@ VTFLIB_API vlBool vlInitialize()
 	bInitialized = vlTrue;
 
 	ImageVector = new CImageVector();
-	MaterialVector = new CMaterialVector();
 
 	return vlTrue;
 }
@@ -116,7 +109,6 @@ VTFLIB_API vlVoid vlShutdown()
 	bInitialized = vlFalse;
 
 	Image = 0;
-	Material = 0;
 
 	for(i = 0; i < ImageVector->size(); i++)
 	{
@@ -125,14 +117,6 @@ VTFLIB_API vlVoid vlShutdown()
 
 	delete ImageVector;
 	ImageVector = 0;
-
-	for(i = 0; i < MaterialVector->size(); i++)
-	{
-		delete (*MaterialVector)[i];
-	}
-
-	delete MaterialVector;
-	MaterialVector = 0;
 }
 
 VTFLIB_API vlBool vlGetBoolean(VTFLibOption Option)
@@ -165,9 +149,6 @@ VTFLIB_API vlInt vlGetInteger(VTFLibOption Option)
 		return (vlInt)uiBlueScreenClearG;
 	case VTFLIB_BLUESCREEN_CLEAR_B:
 		return (vlInt)uiBlueScreenClearB;
-
-	case VTFLIB_VMT_PARSE_MODE:
-		return (vlInt)uiVMTParseMode;
 	}
 
 	return 0;
@@ -225,12 +206,6 @@ VTFLIB_API vlVoid vlSetInteger(VTFLibOption Option, vlInt iValue)
 		else if(iValue > 65535)
 			iValue = 65535;
 		uiBlueScreenClearB = (vlUShort)iValue;
-		break;
-
-	case VTFLIB_VMT_PARSE_MODE:
-		if(iValue < 0 || iValue >= PARSE_MODE_COUNT)
-			return;
-		uiVMTParseMode = (vlUInt)iValue;
 		break;
 	}
 }
@@ -331,7 +306,7 @@ VTFLIB_API vlVoid vlSetFloat(VTFLibOption Option, vlSingle sValue)
 vlBool createSingle(vlUInt width, vlUInt height, unsigned char* data) {
 	SVTFCreateOptions options;
 	vlImageCreateDefaultCreateStructure(&options);
-	//	options.ImageFormat = IMAGE_FORMAT_DXT5;
+	options.ImageFormat = IMAGE_FORMAT_DXT5;
 	options.bMipmaps = vlFalse;
 	options.bResize = false;
 	return vlImageCreateSingle(width, height, data, &options);

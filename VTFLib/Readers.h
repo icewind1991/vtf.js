@@ -7,6 +7,4 @@
  */
 
 #include "Reader.h"
-#include "FileReader.h"
 #include "MemoryReader.h"
-#include "ProcReader.h"

@@ -1057,8 +1057,8 @@ vlBool CVTFFile::IsLoaded() const
 
 vlBool CVTFFile::Load(const vlChar *cFileName, vlBool bHeaderOnly)
 {
-	IO::Readers::CFileReader i = IO::Readers::CFileReader(cFileName);
-	return this->Load(&i, bHeaderOnly);
+//	IO::Readers::CFileReader i = IO::Readers::CFileReader(cFileName);
+//	return this->Load(&i, bHeaderOnly);
 }
 
 vlBool CVTFFile::Load(const vlVoid *lpData, vlUInt uiBufferSize, vlBool bHeaderOnly)
@@ -1069,14 +1069,14 @@ vlBool CVTFFile::Load(const vlVoid *lpData, vlUInt uiBufferSize, vlBool bHeaderO
 
 vlBool CVTFFile::Load(vlVoid *pUserData, vlBool bHeaderOnly)
 {
-	IO::Readers::CProcReader i = IO::Readers::CProcReader(pUserData);
-	return this->Load(&i, bHeaderOnly);
+//	IO::Readers::CProcReader i = IO::Readers::CProcReader(pUserData);
+//	return this->Load(&i, bHeaderOnly);
 }
 
 vlBool CVTFFile::Save(const vlChar *cFileName) const
 {
-	IO::Writers::CFileWriter i = IO::Writers::CFileWriter(cFileName);
-	return this->Save(&i);
+//	IO::Writers::CFileWriter i = IO::Writers::CFileWriter(cFileName);
+//	return this->Save(&i);
 }
 
 vlBool CVTFFile::Save(vlVoid *lpData, vlUInt uiBufferSize, vlUInt &uiSize) const
@@ -1094,8 +1094,8 @@ vlBool CVTFFile::Save(vlVoid *lpData, vlUInt uiBufferSize, vlUInt &uiSize) const
 
 vlBool CVTFFile::Save(vlVoid *pUserData) const
 {
-	IO::Writers::CProcWriter i = IO::Writers::CProcWriter(pUserData);
-	return this->Save(&i);
+//	IO::Writers::CProcWriter i = IO::Writers::CProcWriter(pUserData);
+//	return this->Save(&i);
 }
 
 // -----------------------------------------------------------------------------------

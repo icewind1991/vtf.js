@@ -6,11 +6,5 @@
 	"keywords": [
 		"vtf"
 	],
-	"main": "vtf.js",
-	"engines": {
-		"node": ">=0.12.0"
-	},
-	"dependencies": {
-		"dxt-js": "*"
-	}
+	"main": "src/vtf.js"
 }

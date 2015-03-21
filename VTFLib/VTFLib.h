@@ -102,23 +102,18 @@
 #include "stdafx.h"
 #include "Error.h"
 #include "VTFFile.h"
-#include "VMTFile.h"
 
 #include <vector>
 
 namespace VTFLib
 {
 	typedef std::vector<VTFLib::CVTFFile *> CImageVector;
-	typedef std::vector<VTFLib::CVMTFile *> CMaterialVector;
 
 	extern vlBool bInitialized;
 	extern Diagnostics::CError LastError;
 
 	extern CVTFFile *Image;
 	extern CImageVector *ImageVector;
-
-	extern CVMTFile *Material;
-	extern CMaterialVector *MaterialVector;
 
 	extern vlUInt uiDXTQuality;
 
