@@ -1,6 +1,6 @@
 {
 	"name": "vtf",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Work with VTF files in javascript",
 	"author": "Robin Appelman <robin@icewind.nl>",
 	"keywords": [
