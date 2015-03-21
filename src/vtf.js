@@ -22,7 +22,7 @@ var fromData = vtflib.cwrap('fromData', 'boolean', ['number', 'number', 'number'
  * @returns {int}
  */
 function pointerFromData(sourceData) {
-	var buf = vtflib._malloc(sourceData.length * 4);
+	var buf = vtflib._malloc(sourceData.length);
 	vtflib.HEAPU8.set(sourceData, buf);
 	return buf;
 }
