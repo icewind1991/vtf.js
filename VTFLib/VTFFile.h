@@ -21,7 +21,6 @@
 #define VTFFILE_H
 
 #include "stdafx.h"
-#include "../squish/squish.h"
 #include "Readers.h"
 #include "Writers.h"
 #include "VTFFormat.h"
@@ -29,8 +28,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-extern vlBool canvasResize(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA8888, vlUInt uiSourceWidth, vlUInt uiSourceHeight, vlUInt uiDestWidth, vlUInt uiDestHeight);
 
 //! VTFImageFormat info struct.
 /*!  

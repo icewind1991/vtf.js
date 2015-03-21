@@ -11,10 +11,8 @@
 
 #include "VTFLib.h"
 #include "VTFFile.h"
+#include "VMTFile.h"
 #include "VTFWrapper.h"
-//#include <emscripten/bind.h>
-
-//using namespace emscripten;
 
 using namespace VTFLib;
 
@@ -25,6 +23,9 @@ namespace VTFLib
 
 	CVTFFile *Image = 0;
 	CImageVector *ImageVector = 0;
+
+	CVMTFile *Material = 0;
+	CMaterialVector *MaterialVector = 0;
 
 	vlUInt uiDXTQuality = DXT_QUALITY_HIGH;
 
@@ -51,7 +52,7 @@ namespace VTFLib
 	vlSingle sXSharpenStrength = 255.0f;
 	vlSingle sXSharpenThreshold = 255.0f;
 
-	vlUInt uiVMTParseMode = 0;
+	vlUInt uiVMTParseMode = PARSE_MODE_LOOSE;
 }
 
 //
@@ -96,6 +97,7 @@ VTFLIB_API vlBool vlInitialize()
 	bInitialized = vlTrue;
 
 	ImageVector = new CImageVector();
+	MaterialVector = new CMaterialVector();
 
 	return vlTrue;
 }
@@ -114,6 +116,7 @@ VTFLIB_API vlVoid vlShutdown()
 	bInitialized = vlFalse;
 
 	Image = 0;
+	Material = 0;
 
 	for(i = 0; i < ImageVector->size(); i++)
 	{
@@ -122,6 +125,14 @@ VTFLIB_API vlVoid vlShutdown()
 
 	delete ImageVector;
 	ImageVector = 0;
+
+	for(i = 0; i < MaterialVector->size(); i++)
+	{
+		delete (*MaterialVector)[i];
+	}
+
+	delete MaterialVector;
+	MaterialVector = 0;
 }
 
 VTFLIB_API vlBool vlGetBoolean(VTFLibOption Option)
@@ -154,6 +165,9 @@ VTFLIB_API vlInt vlGetInteger(VTFLibOption Option)
 		return (vlInt)uiBlueScreenClearG;
 	case VTFLIB_BLUESCREEN_CLEAR_B:
 		return (vlInt)uiBlueScreenClearB;
+
+	case VTFLIB_VMT_PARSE_MODE:
+		return (vlInt)uiVMTParseMode;
 	}
 
 	return 0;
@@ -211,6 +225,12 @@ VTFLIB_API vlVoid vlSetInteger(VTFLibOption Option, vlInt iValue)
 		else if(iValue > 65535)
 			iValue = 65535;
 		uiBlueScreenClearB = (vlUShort)iValue;
+		break;
+
+	case VTFLIB_VMT_PARSE_MODE:
+		if(iValue < 0 || iValue >= PARSE_MODE_COUNT)
+			return;
+		uiVMTParseMode = (vlUInt)iValue;
 		break;
 	}
 }
@@ -311,23 +331,55 @@ VTFLIB_API vlVoid vlSetFloat(VTFLibOption Option, vlSingle sValue)
 vlBool createSingle(vlUInt width, vlUInt height, unsigned char* data) {
 	SVTFCreateOptions options;
 	vlImageCreateDefaultCreateStructure(&options);
-//	options.ImageFormat = IMAGE_FORMAT_DXT5;
+	//	options.ImageFormat = IMAGE_FORMAT_DXT5;
 	options.bMipmaps = vlFalse;
-	options.bResize=false;
+	options.bResize = false;
 	return vlImageCreateSingle(width, height, data, &options);
 }
 
-extern "C"{
-
-
-	bool fromData(vlUInt width, vlUInt height, unsigned char* data) {
-		vlUInt uiVTFImage;
-		vlInitialize();
-		vlCreateImage(&uiVTFImage);
-		vlBindImage(uiVTFImage);
-		bool result= createSingle(width, height, data);
-//		printf(" Error creating vtf file:\n%s\n\n", vlGetLastError());
-		return result;
-	//	vlImageSaveLump()
-	}
+extern "C" {
+bool fromData(vlUInt width, vlUInt height, unsigned char *data) {
+	vlUInt uiVTFImage;
+	vlInitialize();
+	vlCreateImage(&uiVTFImage);
+	vlBindImage(uiVTFImage);
+	bool result = createSingle(width, height, data);
+	return result;
+//	vlImageSaveLump()
 }
+}
+
+#ifdef _WIN32
+
+//
+// DllMain()
+// DLL entry point.
+//
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
+{
+	switch(dwReason)
+	{
+	case DLL_PROCESS_ATTACH:
+		break;
+	case DLL_THREAD_ATTACH:
+		break;
+	case DLL_THREAD_DETACH:
+		break;
+	case DLL_PROCESS_DETACH:
+		vlShutdown();
+		break;
+	}
+    return TRUE;
+}
+
+#else
+
+void __attribute__ ((constructor)) DllEntry(void)
+{
+}
+
+void __attribute__ ((destructor)) DllExit(void) {
+	vlShutdown();
+}
+
+#endif

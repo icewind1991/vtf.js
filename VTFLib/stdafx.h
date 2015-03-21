@@ -13,17 +13,30 @@
 // NOTE: This file is commented for compatibility with Doxygen.
 // ============================================================
 /*!
-    \file StdAfx.h
-    \brief Application framework header plus VTFLib custom data types.
+	\file StdAfx.h
+	\brief Application framework header plus VTFLib custom data types.
 */
 
 #ifndef STDAFX_H
 #define STDAFX_H
 
-#ifdef VTFLIB_EXPORTS
-#	define VTFLIB_API
+#ifdef _WIN32
+#	ifdef VTFLIB_EXPORTS
+#		define VTFLIB_API __declspec(dllexport)
+#	else
+#		define VTFLIB_API __declspec(dllimport)
+#	endif
 #else
-#	define VTFLIB_API
+#	ifdef VTFLIB_EXPORTS
+#		if __GNUC__ >= 4
+#			pragma GCC visibility push(hidden)
+#			define VTFLIB_API __attribute__ ((visibility ("default")))
+#		else
+#			define VTFLIB_API
+#		endif
+#	else
+#		define VTFLIB_API
+#	endif
 #endif
 
 // Custom data types
@@ -40,34 +53,44 @@ typedef float			vlSingle;			//!< Floating point number
 typedef double			vlDouble;			//!< Double number
 typedef void			vlVoid;				//!< Void value.
 
-typedef unsigned char		vlUInt8;
-typedef unsigned short	vlUInt16;
-typedef unsigned long	vlUInt32;
-typedef unsigned long long	vlUInt64;
+#include <stdint.h>
+
+typedef uint8_t		vlUInt8;
+typedef uint16_t	vlUInt16;
+typedef uint32_t	vlUInt32;
+typedef uint64_t	vlUInt64;
 
 typedef vlSingle		vlFloat;			//!< Floating point number (same as vlSingled).
 
 #define vlFalse			0
 #define vlTrue			1
 
-#define FILE_BEGIN 0
-#define FILE_CURRENT 1
-#define FILE_END 2
-
 #if _MSC_VER >= 1400
 #	define _CRT_SECURE_NO_WARNINGS
 #	define _CRT_NONSTDC_NO_DEPRECATE
 #endif
 
-#define WIN32_LEAN_AND_MEAN
-//#include <windows.h>
-#include <stdlib.h>
 #include <stdio.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <errno.h>
+#include <string.h>
+typedef void *LPVOID;
+typedef void *PVOID;
+typedef FILE *HANDLE;
+typedef char CHAR;
+typedef CHAR *LPSTR;
+typedef int BOOL;
+#define FILE_BEGIN 0
+#define FILE_CURRENT 1
+#define FILE_END -1
+#endif
+#include <stdlib.h>
 #include <assert.h>
 #include <math.h>
 #include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
 
 #if _MSC_VER >= 1600 // Visual Studio 2010
 #	define STATIC_ASSERT(condition, message) static_assert(condition, message)

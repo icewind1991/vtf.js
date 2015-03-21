@@ -41,14 +41,14 @@ namespace VTFLib
 			~CError();
 
 			//! Clear the error message buffer.
-			void Clear();
+			vlVoid Clear();
 
 			//! Get the error message text.
 			const vlChar *Get() const;
 
 			//! Set the error message buffer.
-			void SetFormatted(const vlChar *cFormat, ...);
-			void Set(const vlChar *cErrorMessage, vlBool bSystemError = vlFalse);
+			vlVoid SetFormatted(const vlChar *cFormat, ...);
+			vlVoid Set(const vlChar *cErrorMessage, vlBool bSystemError = vlFalse);
 		};
 	}
 }

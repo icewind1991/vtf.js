@@ -27,7 +27,7 @@
 // Defines for data alignment
 //---------------------------
 #define CACHE_LINE  16								//!< Alignment size.
-#define CACHE_ALIGN __declspec(align(CACHE_LINE))	//!< Storage-class information alignment.
+#define CACHE_ALIGN __attribute__ ((aligned (CACHE_LINE)))	//!< Storage-class information alignment.
 
 // Macros
 //-------
@@ -72,6 +72,7 @@ class Vector
 	Can be initialized with a value or set to zero by default.
 	\see CACHE_ALIGN
 */
+
 class CACHE_ALIGN VectorAligned
 {
 	public:

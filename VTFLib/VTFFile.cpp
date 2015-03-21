@@ -14,6 +14,7 @@
 #include "VTFFormat.h"
 #include "VTFDXTn.h"
 #include "VTFMathlib.h"
+#include "squish.h"
 
 // Note: VTF creation requires nvDXTLib and has been
 //       tested with version 8.31.1127.1645, availible here:
@@ -58,7 +59,7 @@
 
 using namespace VTFLib;
 
-#ifdef USE_NVDXT
+#ifdef USE_NVDXT10
 struct SNVCompressionUserData
 {
 public:
@@ -572,7 +573,6 @@ vlBool CVTFFile::Create(vlUInt uiWidth, vlUInt uiHeight, vlUInt uiFrames, vlUInt
 	{
 		if(VTFCreateOptions.bResize)
 		{
-			printf("resize");
 			vlUInt uiNewWidth = uiWidth;
 			vlUInt uiNewHeight = uiHeight;
 
@@ -866,6 +866,22 @@ vlBool CVTFFile::Create(vlUInt uiWidth, vlUInt uiHeight, vlUInt uiFrames, vlUInt
 						// The UserData struct gets passed to our callback.
 						Options.user_data = &UserData;
 
+
+						int mipmapSize = squish::GetMipmapCount()
+						squish::CompressImage(lpImageDataRGBA8888[i + j + k], this->Header->Width, this->Header->Height);
+						// Set the image data of a VTFFile object for the specified face and frame.
+						assert((vlUInt)count == CVTFFile::ComputeImageSize((vlUInt)mipMapData->width, (vlUInt)mipMapData->height, 1, UserData->ImageFormat));
+
+						if(MipmapImageFormat == this->GetFormat())
+						{
+							this->SetData(i, j, k, (vlUInt)mipMapData->mipLevel, (vlByte *)buffer);
+						}
+						else
+						{
+							assert(UserData->pVTFFile->GetFormat() != IMAGE_FORMAT_DXT1 && UserData->pVTFFile->GetFormat() != IMAGE_FORMAT_DXT1_ONEBITALPHA && UserData->pVTFFile->GetFormat() != IMAGE_FORMAT_DXT3 && UserData->pVTFFile->GetFormat() != IMAGE_FORMAT_DXT5);
+
+							CVTFFile::ConvertFromRGBA8888((vlByte *)buffer, UserData->pVTFFile->GetData(UserData->uiFrame, UserData->uiFace, UserData->uiSlice, (vlUInt)mipMapData->mipLevel), (vlUInt)mipMapData->width, (vlUInt)mipMapData->height, UserData->pVTFFile->GetFormat());
+						}
 						if(!nvDXTCompressWrapper(lpImageDataRGBA8888[i + j + k], this->Header->Width, this->Header->Height, &Options, NVWriteCallback))
 						{
 							throw 0;
@@ -1039,9 +1055,28 @@ vlBool CVTFFile::IsLoaded() const
 	return this->Header != 0;
 }
 
+vlBool CVTFFile::Load(const vlChar *cFileName, vlBool bHeaderOnly)
+{
+	IO::Readers::CFileReader i = IO::Readers::CFileReader(cFileName);
+	return this->Load(&i, bHeaderOnly);
+}
+
+vlBool CVTFFile::Load(const vlVoid *lpData, vlUInt uiBufferSize, vlBool bHeaderOnly)
+{
+	IO::Readers::CMemoryReader i = IO::Readers::CMemoryReader(lpData, uiBufferSize);
+	return this->Load(&i, bHeaderOnly);
+}
+
+vlBool CVTFFile::Load(vlVoid *pUserData, vlBool bHeaderOnly)
+{
+	IO::Readers::CProcReader i = IO::Readers::CProcReader(pUserData);
+	return this->Load(&i, bHeaderOnly);
+}
+
 vlBool CVTFFile::Save(const vlChar *cFileName) const
 {
-//	return this->Save(&IO::Writers::CFileWriter(cFileName));
+	IO::Writers::CFileWriter i = IO::Writers::CFileWriter(cFileName);
+	return this->Save(&i);
 }
 
 vlBool CVTFFile::Save(vlVoid *lpData, vlUInt uiBufferSize, vlUInt &uiSize) const
@@ -1059,7 +1094,8 @@ vlBool CVTFFile::Save(vlVoid *lpData, vlUInt uiBufferSize, vlUInt &uiSize) const
 
 vlBool CVTFFile::Save(vlVoid *pUserData) const
 {
-//	return this->Save(&IO::Writers::CProcWriter(pUserData));
+	IO::Writers::CProcWriter i = IO::Writers::CProcWriter(pUserData);
+	return this->Save(&i);
 }
 
 // -----------------------------------------------------------------------------------
@@ -3398,27 +3434,27 @@ vlBool CVTFFile::ConvertFromRGBA8888(vlByte *lpSource, vlByte *lpDest, vlUInt ui
 //
 // CompressDXTn()
 // Compress input image data (lpSource) to output image data (lpDest) of format DestFormat
-// where DestFormat is of format DXTn.  Uses squish.
+// where DestFormat is of format DXTn.  Uses NVidia DXT library.
 //
 vlBool CVTFFile::CompressDXTn(vlByte *lpSource, vlByte *lpDest, vlUInt uiWidth, vlUInt uiHeight, VTFImageFormat DestFormat)
 {
-	int flags = 0;
+	int format = 0;
 	switch(DestFormat)
 	{
 	case IMAGE_FORMAT_DXT1:
-		flags = ( 1 << 0 );
+		format = squish::kDxt1;
 		break;
 	case IMAGE_FORMAT_DXT3:
-		flags = ( 1 << 1 );
+		format = squish::kDxt3;
 		break;
 	case IMAGE_FORMAT_DXT5:
-		flags = ( 1 << 2 );
+		format = squish::kDxt5;
 		break;
 	default:
 		LastError.Set("Destination image format not supported.");
 		return vlFalse;
 	}
-	squish::CompressImage(lpSource, uiWidth, uiHeight, lpDest, flags);
+	squish::CompressImage(lpSource, uiWidth, uiHeight, lpDest, format);
 	return vlTrue;
 }
 
@@ -4025,11 +4061,17 @@ vlBool CVTFFile::ConvertToNormalMap(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA
 #endif
 }
 
+extern "C" {
+extern void canvasResize(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA8888, vlUInt uiSourceWidth, vlUInt uiSourceHeight, vlUInt uiDestWidth, vlUInt uiDestHeight);
+}
+
 vlBool CVTFFile::Resize(vlByte *lpSourceRGBA8888, vlByte *lpDestRGBA8888, vlUInt uiSourceWidth, vlUInt uiSourceHeight, vlUInt uiDestWidth, vlUInt uiDestHeight, VTFMipmapFilter ResizeFilter, VTFSharpenFilter SharpenFilter)
 {
 	assert(ResizeFilter >= 0 && ResizeFilter < MIPMAP_FILTER_COUNT);
 	assert(SharpenFilter >= 0 && SharpenFilter < SHARPEN_FILTER_COUNT);
-	return canvasResize(lpSourceRGBA8888, lpDestRGBA8888, uiSourceWidth, uiSourceHeight, uiDestWidth, uiDestHeight);
+
+	canvasResize(lpSourceRGBA8888, lpDestRGBA8888, uiSourceWidth, uiSourceHeight, uiDestWidth, uiDestHeight);
+	return vlTrue;
 }
 
 //

@@ -363,12 +363,20 @@ struct SVTFHeader_70 : public SVTFFileHeader
 	vlByte			LowResImageHeight;				//!< Thumbnail image height
 };
 
+#ifdef _WIN32
+#define ALIGN_BEFORE __declspec(align(16))
+#define ALIGN_AFTER
+#else
+#define ALIGN_BEFORE
+#define ALIGN_AFTER __attribute__ ((aligned (16)));
+#endif
+
 //! VTFHeader_70_A struct.
 /*!
 
 	The complete header for v7.0 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_70_A : public SVTFHeader_70 {};
+ALIGN_BEFORE struct SVTFHeader_70_A : public SVTFHeader_70 {} ALIGN_AFTER;
 
 //! VTFHeader_71 struct.
 /*!
@@ -385,7 +393,7 @@ struct SVTFHeader_71 : public SVTFHeader_70
 
 	The complete header for v7.1 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_71_A : public SVTFHeader_71 {};
+ALIGN_BEFORE struct SVTFHeader_71_A : public SVTFHeader_71 {} ALIGN_AFTER;
 
 //! VTFHeader_72 struct.
 /*!
@@ -402,7 +410,7 @@ struct SVTFHeader_72 : public SVTFHeader_71
 
 	The complete header for v7.2 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_72_A : public SVTFHeader_72 {};
+ALIGN_BEFORE struct SVTFHeader_72_A : public SVTFHeader_72 {} ALIGN_AFTER;
 
 //! VTFHeader_73 struct.
 /*!
@@ -420,7 +428,7 @@ struct SVTFHeader_73 : public SVTFHeader_72
 
 	The complete header for v7.3 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_73_A : public SVTFHeader_73 {};
+ALIGN_BEFORE struct SVTFHeader_73_A : public SVTFHeader_73 {} ALIGN_AFTER;
 
 //! VTFHeader_74 struct.
 /*!
@@ -437,7 +445,7 @@ struct SVTFHeader_74 : public SVTFHeader_73
 
 	The complete header for v7.4 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_74_A : public SVTFHeader_74 {};
+ALIGN_BEFORE struct SVTFHeader_74_A : public SVTFHeader_74 {} ALIGN_AFTER;
 
 //! VTFHeader_75 struct.
 /*!
@@ -454,7 +462,7 @@ struct SVTFHeader_75 : public SVTFHeader_74
 
 	The complete header for v7.5 of the VTF file format aligned to 16 bytes.
 */
-__declspec(align(16)) struct SVTFHeader_75_A : public SVTFHeader_75 {};
+ALIGN_BEFORE struct SVTFHeader_75_A : public SVTFHeader_75 {} ALIGN_AFTER;
 
 struct SVTFResource
 {

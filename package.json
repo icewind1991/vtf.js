@@ -1,0 +1,16 @@
+{
+	"name": "vtf",
+	"version": "0.0.1",
+	"description": "Work with VTF files in javascript",
+	"author": "Robin Appelman <robin@icewind.nl>",
+	"keywords": [
+		"vtf"
+	],
+	"main": "vtf.js",
+	"engines": {
+		"node": ">=0.12.0"
+	},
+	"dependencies": {
+		"dxt-js": "*"
+	}
+}

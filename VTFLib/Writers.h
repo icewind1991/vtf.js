@@ -7,4 +7,6 @@
  */
 
 #include "Writer.h"
+#include "FileWriter.h"
 #include "MemoryWriter.h"
+#include "ProcWriter.h"

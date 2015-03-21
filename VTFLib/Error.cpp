@@ -51,6 +51,25 @@ vlVoid CError::Set(const vlChar *cErrorMessage, vlBool bSystemError)
 	vlChar cBuffer[2048];
 	if(bSystemError)
 	{
+		LPVOID lpMessage;
+		#ifdef _WIN32
+		vlUInt uiLastError = GetLastError();
+		#else
+		vlUInt uiLastError = errno;
+		#endif
+
+		#ifdef _WIN32
+		if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, uiLastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMessage, 0, NULL))
+		{
+			sprintf(cBuffer, "Error:\n%s\n\nSystem Error: 0x%.8x:\n%s", cErrorMessage, uiLastError, lpMessage); 
+
+			LocalFree(lpMessage);
+		}
+		else
+		#endif
+		{
+			sprintf(cBuffer, "Error:\n%s\n\nSystem Error: 0x%.8x.", cErrorMessage, uiLastError); 
+		}
 
 		
 	}
