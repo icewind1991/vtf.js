@@ -11,3 +11,7 @@ var vtf = require('./src/vtf.js');
 // rgba data should be an uint8array
 var outputRGBAData vtf.fromRGBA(inputRGABATA, width, height);
 ```
+
+## Licence
+
+LGPL
